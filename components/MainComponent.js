@@ -3,6 +3,7 @@ import Home from './HomeComponent';
 import Directory from './DirectoryComponent';
 import CampsiteInfo from './CampsiteInfoComponent';
 import Contact from './ContactComponent';
+import Reservation from './ReservationComponent';
 import About from './AboutComponent';
 import Constants from 'expo-constants';
 import { View, Platform, StyleSheet, Text, ScrollView, Image } from 'react-native';
@@ -121,6 +122,28 @@ const ContactNavigator = createStackNavigator(
         })
     }
 );
+const ReservationNavigator = createStackNavigator(
+    {
+        Reservation: { screen: Reservation }
+    },
+    {
+        defaultNavigationOptions: ({navigation}) => ({
+            headerStyle: {
+                backgroundColor: '#5637DD'
+            },
+            headerTintColor: '#fff',
+            headerTitleStyle: {
+                color: '#fff'
+            },
+            headerLeft: <Icon
+                name='tree'
+                type='font-awesome'
+                iconStyle={styles.stackIcon}
+                onPress={() => navigation.toggleDrawer()}
+            />
+        })
+    }
+);
 
 const CustomDrawerContentComponent = props => (
     <ScrollView>
@@ -168,7 +191,22 @@ const MainNavigator = createDrawerNavigator(
                 )
             }
         },
-        About: {
+        Reservation: {
+            screen: ReservationNavigator,
+            navigationOptions: {
+                drawerLabel: 'Reserve Campsite',
+                drawerIcon: ({tintColor}) => (
+                    <Icon
+                        name='tree'
+                        type='font-awesome'
+                        size={24}
+                        color={tintColor}
+                    />
+            )
+        }
+    },
+    
+         About: {
             screen: AboutNavigator,
             navigationOptions: {
                 drawerLabel: 'About Us',
