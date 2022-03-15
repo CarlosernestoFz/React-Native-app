@@ -313,7 +313,7 @@ const MainNavigator = createDrawerNavigator(
         }
     },
     {
-        initialRouteName: 'Home',
+initialRouteName: 'Home',
         drawerBackgroundColor: '#CEC8FF',
         contentComponent: CustomDrawerContentComponent
 

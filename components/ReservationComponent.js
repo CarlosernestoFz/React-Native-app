@@ -3,6 +3,8 @@ import { Text, View, ScrollView, StyleSheet,
     Picker, Switch, Button, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Animatable from 'react-native-animatable';
+import * as Notifications from 'expo-notifications';
+
 
 class Reservation extends Component {
 
@@ -20,7 +22,36 @@ class Reservation extends Component {
 
     handleReservation() {
         console.log(JSON.stringify(this.state));
+        const message = `Number of Campers: ${this.state.campers}
+                         \n hike-in? ${this.state.hikeIn}
+                         \nDate: ${this.state.date.toLocaleDateString('en-US')}`;
+
+        Alert.alert(
+             'Begin Search?',
+             message,
+             [
+                 {
+                     text: 'Cancel',
+                     onPress: () => {
+                         console.log('Reservation Search Canceled');
+                         this.resetForm();
+                     },
+                     style: 'cancel'
+
+                 },
+                 {
+                    text: 'OK', 
+                    onPress: () => {
+                        this.presentLocalNotification(this.state.date.toLocaleDateString('en-US'));
+                        this.resetForm();
+                    }
+                 }
+
+             ],
+             { cancelable: false}
+        );
     }
+
 
     resetForm() {
         this.setState({
@@ -31,7 +62,33 @@ class Reservation extends Component {
         });
     }
 
-  
+    async presentLocalNotification(date) {
+        function sendNotification() {
+            Notifications.setNotificationHandler({
+                handleNotification: async () => ({
+                    shouldShowAlert: true
+                })
+            });
+
+            Notifications.scheduleNotificationAsync({
+
+                content: {
+                    title: 'Your Campsite Reservation Search',
+                    body: `Search for ${date} requested`
+                },
+                trigger: null
+            });
+        }
+
+        let permissions = await Notifications.getPermissionsAsync();
+        if (!permissions.granted) {
+            permissions = await Notifications.requestPermissionsAsync();
+        }
+        if (permissions.granted) {
+            sendNotification();
+        }
+    }
+
 
     static navigationOptions = {
         title: 'Reserve Campsite'
@@ -90,35 +147,12 @@ class Reservation extends Component {
                         />
                     )}
                     <View style={styles.formRow}>
-                        <Button
-                            onPress={() => 
-
-                                Alert.alert(
-                                    'Begin Search?',
-                                    'Number of Campers: ' + this.state.campers + '\n' + 
-                                    'hike-in' + this.state.hikeIn + '\n' +
-                                    'Date:' + this.state.date.toLocaleDateString('en-US'),
-                                    [
-                              
-                                        {
-                                            text: 'Cancel',
-                                            onPress: () => this.resetForm(),
-                                            style: 'cancel'
-                                        },
-                                        {
-                                            text: 'OK',
-                                            onPress: () => this.resetForm()
-                                        
-                                        },
-                                    ]
-     
-                                 
-                                )}
-
-                            title='Search'
-                            color='#5637DD'
-                            accessibilityLabel='Tap me to search for available campsites to reserve'
-                        />
+                    <Button
+                        onPress={() => this.handleReservation()}
+                        title='Search'
+                        color='#5637DD'
+                        accessibilityLabel='Tap me to search for available campsites to reserve'
+                    />
                     </View>
             </Animatable.View>
 
